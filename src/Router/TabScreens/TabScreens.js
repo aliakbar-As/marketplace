@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreens from './HomeScreens';
 
 import MyTabBar from './MyTabBar'
+import OrderScreens from './OrderScreens';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,10 +28,10 @@ export default TabScreens = () => {
             />
             <Tab.Screen
                 name='OrderScreens'
-                component={HomeScreens}
+                component={OrderScreens}
                 options={{
-                    tabBarLabel: 'Cart',
-                    iconName: 'shoppingcart',
+                    tabBarLabel: 'Orders',
+                    iconName: 'carryout',
                     headerShown: false
                 }}
             />

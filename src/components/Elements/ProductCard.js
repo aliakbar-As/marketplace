@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     View, Text,
     Image,
     TouchableHighlight
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import FastImage from 'react-native-fast-image'
 
 
 
@@ -18,22 +17,20 @@ export const ProductCard = ({
     price,
     priceConvertor,
     discountPercentage,
-    onPress
+    onPress,
+    status
 }) => {
+
     return (
         <TouchableHighlight
             onPress={onPress}
             underlayColor={'transparent'}>
             <View style={styles.card}>
-                <FastImage
-                    source={{
-                        uri: thumbnail,
-                        priority: FastImage.priority.normal,
-                        cache: FastImage.cacheControl.cacheOnly
-                    }}
+                <Image
+                    source={{ uri: thumbnail }}
                     style={styles.productImage}
                 />
-                
+
                 <View style={styles.rightContainer}>
                     <Text numberOfLines={1} style={styles.title}>{title}</Text>
 
@@ -41,22 +38,26 @@ export const ProductCard = ({
                         {description}
                     </Text>
 
+                    {brand === undefined ?
+                        <Text style={[styles.brand, { color: status === 0 ? 'orange' : status === 1 ? 'green' : 'red' }]}>
+                            {status === 0 ? 'Pending' : status === 1 ? 'Delivered' : 'Canceled'}
+                        </Text>
+                        :
+                        <View style={styles.middleContainer}>
+                            <Text style={styles.brand}>Brand : {brand}</Text>
 
-                    <View style={styles.middleContainer}>
-                        <Text style={styles.brand}>Brand : {brand}</Text>
 
+                            <View style={styles.starView}>
+                                <Icon
+                                    name={'star'}
+                                    color={'yellow'}
+                                    size={15}
+                                    style={{ marginRight: 5 }}
+                                />
+                                <Text style={styles.ratingTitle}>{rating}</Text>
+                            </View>
 
-                        <View style={styles.starView}>
-                            <Icon
-                                name={'star'}
-                                color={'yellow'}
-                                size={15}
-                                style={{ marginRight: 5 }}
-                            />
-                            <Text style={styles.ratingTitle}>{rating}</Text>
-                        </View>
-
-                    </View>
+                        </View>}
 
 
 

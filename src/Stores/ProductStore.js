@@ -1,4 +1,4 @@
-import { types, applySnapshot } from 'mobx-state-tree';
+import { types } from 'mobx-state-tree';
 import { SingleProduct } from './models/SingleModels';
 import { request, Logger } from '../Utils';
 
@@ -11,7 +11,7 @@ const productStore = types.model('ProductStore', {
     loading: types.optional(types.boolean, false),
 }).actions(self => {
     return {
-        fetchDate(clear = false) {
+        async fetchDate(clear = false) {
             return new Promise((resolve, reject) => {
 
                 if (clear) this.resetList();
@@ -26,6 +26,29 @@ const productStore = types.model('ProductStore', {
             });
         },
 
+        async getCategories() {
+            return new Promise((resolve, reject) => {
+                request.get('/products/categories')
+                    .then(res => {
+                        Logger(res.data, 'categories');
+
+                        resolve(res.data);
+                    }).catch(error => console.log('cats Error', error));
+            });
+        },
+
+        async getProductsByCategory(category) {
+            return new Promise((resolve, reject) => {
+                request.get(`/products/category/${category}`)
+                    .then(res => {
+                        Logger(res.data, 'categories');
+                        this.resetList();
+                        this.fillData(res.data.products)
+                        resolve();
+                    }).catch(error => console.log('cats Error', error));
+            });
+        },
+
         resetList() {
             self.page = 1;
             self.data = [];
@@ -33,7 +56,6 @@ const productStore = types.model('ProductStore', {
         },
 
         onEndReached() {
-            console.log('on end')
             if (self.isLastPage || self.loading) {
                 return false;
             };

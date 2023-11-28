@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
     View,
     FlatList,
-    Dimensions
+    Dimensions,
+    Text, ScrollView, TouchableWithoutFeedback,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 
@@ -37,49 +38,86 @@ const Home = ({ navigation }) => {
 
     const [refreshing, setRefreshing] = useState(false);
 
+    const [categories, setCategories] = useState([]);
+    const [categorySelectedTitle, setCategorySelectedTitle] = useState('');
 
     useEffect(() => {
-        getProducts();
+        getCategories();
 
     }, []);
 
-    const getProducts = () => {
+    const getCategories = () => {
         setRefreshing(true);
-        ProductStore.fetchDate(true).then(res => {
+        ProductStore.getCategories().then(res => {
+            setCategories(res);
+            getProducts();
+        });
+    };
+
+    const getProducts = () => {
+        ProductStore.fetchDate(true).then(() => {
             setRefreshing(false);
         });
     };
 
+
+    const onCatSelected = (category) => {
+        setCategorySelectedTitle(category);
+        setRefreshing(true);
+        ProductStore.getProductsByCategory(category).then(() => {
+            setRefreshing(false);
+        });
+    };
 
     return (
         <View style={styles.container}>
 
             <FlatList
                 ListHeaderComponent={() => (
-                    <Swiper
-                        key={sliderItems.length}
-                        loop
-                        dot={<View style={styles.dot} />}
-                        activeDot={<View style={styles.activeDot} />}
-                        height={200}>
-                        {sliderItems.map(item => (
-                            <FastImage
-                                key={item.id}
-                                source={{
-                                    uri: item.image,
-                                    priority: FastImage.priority.low,
-                                    cache: FastImage.cacheControl.cacheOnly
-                                }}
-                                style={styles.imagesSlider}
-                            />
-                        ))}
-                    </Swiper>
+                    <View>
+                        <Swiper
+                            key={sliderItems.length}
+                            loop autoplay
+                            autoplayTimeout={5}
+                            dot={<View style={styles.dot} />}
+                            activeDot={<View style={styles.activeDot} />}
+                            height={200}>
+                            {sliderItems.map(item => (
+                                <FastImage
+                                    key={item.id}
+                                    source={{
+                                        uri: item.image,
+                                        priority: FastImage.priority.low,
+                                        cache: FastImage.cacheControl.cacheOnly
+                                    }}
+                                    style={styles.imagesSlider}
+                                />
+                            ))}
+                        </Swiper>
+
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            style={{ marginTop: 10 }}>
+                            {categories.map((item, index) => (
+                                <TouchableWithoutFeedback
+                                    key={index}
+                                    onPress={() => onCatSelected(item)}>
+                                    <View style={[styles.catContainer,
+                                    { backgroundColor: categorySelectedTitle === item ? 'red' : '#fff' }]}>
+                                        <Text style={[styles.catTitles,
+                                        { color: categorySelectedTitle === item ? '#fff' : '#2d2d2d' }]}>{item}</Text>
+                                    </View>
+                                </TouchableWithoutFeedback>
+                            ))}
+                        </ScrollView>
+                    </View>
                 )}
                 keyExtractor={(item, index) => index}
                 data={ProductStore.data}
                 onEndReachedThreshold={0.3}
                 onEndReached={() => ProductStore.onEndReached()}
-                onRefresh={() => getProducts()}
+                onRefresh={() => { setRefreshing(true); getProducts() }}
                 refreshing={refreshing}
                 renderItem={({ item }) => {
                     const price = (item.price * item.discountPercentage) / 100;
@@ -93,18 +131,32 @@ const Home = ({ navigation }) => {
                             rating={item.rating}
                             price={item.price}
                             discountPercentage={item.discountPercentage}
-                        // onPress={() => navigation.navigate('details')}
+                            onPress={() => navigation.navigate('map')}
                         />
                     )
                 }}
             />
-        </View>
+        </View >
 
     );
 };
 
 
 const styles = {
+    catContainer: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 10,
+        marginHorizontal: 8,
+        backgroundColor: '#fff'
+    },
+    catTitles: {
+        color: '#2d2d2d',
+        textAlign: 'center',
+    },
     imagesSlider: {
         width: width,
         height: 200,
@@ -123,93 +175,6 @@ const styles = {
         height: 7,
         borderRadius: 5,
         margin: 3
-    },
-    brand: {
-        fontSize: 14,
-        color: '#575757',
-        textAlign: 'left',
-    },
-    ratingTitle: {
-        fontSize: 10,
-        color: '#575757',
-        textAlign: 'left',
-    },
-    starView: {
-        alignItems: 'center',
-        flexDirection: 'row',
-    },
-    middleContainer: {
-        alignItems: 'center',
-        alignSelf: 'stretch',
-        justifyContent: 'space-between',
-        flexDirection: 'row',
-        marginVertical: 5,
-    },
-    discountTitle: {
-        fontSize: 10,
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    discountView: {
-        backgroundColor: 'red',
-        width: 40,
-        height: 20,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    priceContainer: {
-        alignItems: 'center',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignSelf: 'stretch',
-    },
-    realPriceTitle: {
-        textAlign: 'left',
-        color: '#505050',
-        fontWeight: 'bold',
-        fontSize: 14,
-        textDecorationLine: 'line-through',
-        textDecorationStyle: 'solid'
-    },
-    description: {
-        textAlign: 'left',
-        fontSize: 16,
-        color: '#575757'
-    },
-    priceTitle: {
-        textAlign: 'left',
-        color: '#2d2d2d',
-        fontWeight: 'bold',
-        fontSize: 14,
-    },
-    title: {
-        textAlign: 'left',
-        color: '#000',
-        fontWeight: 'bold',
-        fontSize: 16,
-    },
-    rightContainer: {
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        marginLeft: 10,
-        width: '63%'
-    },
-    productImage: {
-        width: 120,
-        height: 120,
-        alignSelf: 'flex-start',
-        borderRadius: 10
-    },
-    card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderColor: '#ccc',
-        padding: 10,
-        justifyContent: 'flex-start',
-
     },
     container: {
         flex: 1,

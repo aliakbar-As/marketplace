@@ -11,21 +11,11 @@ export const Header = ({
 }) => {
     return (
         <View style={styles.container}>
-            <Icon
-                name={'arrowleft'}
-                size={20}
-                color={'gray'}
-                onPress={backOnclick}
-            />
+            
 
             <Text style={styles.title}>{title}</Text>
 
-            <Icon
-                name={liked ? 'heart' : 'hearto'}
-                size={20}
-                color={liked ? 'red' : 'gray'}
-                onPress={likeOnclick}
-            />
+           
         </View>
     );
 };
@@ -36,6 +26,7 @@ const styles = {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#2d2d2d',
+        flex: 1,
     },
     container: {
         width: '100%',

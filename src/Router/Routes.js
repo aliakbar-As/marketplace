@@ -26,7 +26,6 @@ export default RouterComponent = () => {
                 />
 
 
-
             </Stack.Navigator>
         </NavigationContainer>
     )

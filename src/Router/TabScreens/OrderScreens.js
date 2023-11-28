@@ -1,13 +1,12 @@
 import React from "react";
 import { createStackNavigator } from '@react-navigation/stack';
 
-import Home from "../../components/Screens/Home/Home";
-import Location from "../../components/Screens/Home/Location";
+import Orders from "../../components/Screens/Orders/Orders";
 
 
 const Stack = createStackNavigator();
 
-export default HomeScreens = () => {
+export default OrderScreens = () => {
     return (
         <Stack.Navigator
             initialRouteName="home"
@@ -17,14 +16,10 @@ export default HomeScreens = () => {
         >
 
             <Stack.Screen
-                name="home"
-                component={Home}
+                name="orders"
+                component={Orders}
             />
 
-            <Stack.Screen
-                name="map"
-                component={Location}
-            />
         </Stack.Navigator>
     )
 }
